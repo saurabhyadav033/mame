@@ -17,7 +17,7 @@ Capabitilies
 ------------
 
 The OSD interface is designed to allow three levels of support,
-depending on what the API allows and the amount of effort the expend.
+depending on what the API allows and the amount of effort to expend.
 Those are:
 
 * Level 1: One or more audio targets, only one stream allowed per target (aka exclusive mode)
@@ -35,7 +35,7 @@ Terminology
 
 For this module, we use the terms:
 
-* node: some object we can send audio do.  Can be physical, like speakers, or virtual, like an effect system.  It should have a unique, user-presentable name for the UI.
+* node: some object we can send audio to.  Can be physical, like speakers, or virtual, like an effect system.  It should have a unique, user-presentable name for the UI.
 * port: a channel of a node, has a name (non-unique, like "front left") and a 3D position
 * stream: a connection to a node with allows to send audio to it
 
@@ -126,7 +126,7 @@ stereo target and stream at default sample rate.  To support that,
 only *init*, *exit* and *stream_update* need to be implemented.
 *init* is called at startup and *exit* when quitting and can do
 whatever they need to do.  *stream_update* will be called on a regular
-basis with a buffer of sample_this_frames*2*int16_t with the audio
+basis with a buffer of sample_this_frame*2*int16_t with the audio
 to play.  From this point in the documentation we'll assume more than
 a single stereo channel is wanted.
 
@@ -209,7 +209,7 @@ of the host and the module.  This state is:
 * m_nodes: The vector available nodes (*node_info*)
 
   * m_name: The name of the node
-  * m_id: The numeric id of the node
+  * m_id: The numeric ID of the node
   * m_rate: The minimum, maximum and preferred sample rate for the node
   * m_sinks: The vector of sink (output) ports of the node (*port_info*)
 
@@ -218,20 +218,20 @@ of the host and the module.  This state is:
 
   * m_sources: The vector of source (input) ports of the node.  Currently unused
 
-* m_default_sink: id of the node that is the current "system default" for audio output, 0 if there's no such concept
+* m_default_sink: ID of the node that is the current "system default" for audio output, 0 if there's no such concept
 * m_default_source: same for audio input (currently unused)
 * m_streams: The vector of active streams (*stream_info*)
 
-  * m_id: The numeric id of the stream
+  * m_id: The numeric ID of the stream
   * m_node: The target node of the stream
   * m_volumes: empty if *external_per_channel_volume* is false, current volume value per-channel otherwise
 
-Ids, for nodes and streams, are (independant) 32-bit unsigned non-zero
-values associated to respectively nodes and streams.  Ids should not
-be reused.  A node that goes away then comes back should get a new id.
-A stream that is closed should not enable reuse of its id.
+IDs, for nodes and streams, are (independant) 32-bit unsigned non-zero
+values associated to respectively nodes and streams.  IDs should not
+be reused.  A node that goes away then comes back should get a new ID.
+A stream that is closed should not enable reuse of its ID.
 
-When external control exists, a module is should change the value of
+When external control exists, a module should change the value of
 *stream_info::m_node* when the user changes it, and same for
 *stream_info::m_volumes*.  Generation number should be incremented
 when this happens, so that the core knows to look for changes.
@@ -243,7 +243,7 @@ conversion is needed.
 There is an inherent race condition with this system, because things
 can change at any point after returning for the method.  The idea is
 that the information returned must be internally consistent (a stream
-should not point to a node id that does not exist in the structure,
+should not point to a node ID that does not exist in the structure,
 same for default sink) and that any external change from that state
 should increment the generation number, but that's it.  Through the
 generation system the core will eventually be in sync with the
@@ -265,19 +265,19 @@ A stream is first opened through *stream_sink_open* and targets a
 specific node at a specific sample rate.  It is given a name for use
 by the host sound services for user UI purposes (currently the game
 name if split_streams_per_source is false, the speaker_device tag if
-true).  The returned id must be a non-zero, never-used-before for
+true).  The returned ID must be a non-zero, never-used-before for
 streams value in case of success.  Failures, like when the node went
 away between the get_information call and the open one, should be
 silent and return zero.
 
 *stream_set_volumes* is used only then *external_per_channel_volume*
 is true and is used by the core to set the per-channel volume.  The
-call should just be ignored if the stream id does not exist (or is
-zero).  Do not try to apply volumes in the module if the host api
+call should just be ignored if the stream ID does not exist (or is
+zero).  Do not try to apply volumes in the module if the host API
 doesn't provide for it, let the core handle it.
 
 *stream_close* closes a stream, The call should just be ignored if the
-stream id does not exist (or is zero).
+stream ID does not exist (or is zero).
 
 Opening a stream, closing a stream or changing the volume does not
 need to touch the generation number.
@@ -287,13 +287,13 @@ given stream.  It provides a buffer of *samples_this_frame* * *node
 channel count* channel-interleaved int16_t values.  The lifetime of
 the data in the buffer or the buffer pointer itself is undefined after
 return from the method call.  The call should just be ignored if the
-stream id does not exist (or is zero).
+stream ID does not exist (or is zero).
 
 When a stream goes away because the target node is lost it should just
 be removed from the information, and the core will pick up the node
 departure and close the stream.
 
 Given the assumed raceness of the interface, all the methods should be
-tolerant of obsolete or zero ids being used by the core, and that is
-why id reuse must be avoided.
+tolerant of obsolete or zero IDs being used by the core, and that is
+why ID reuse must be avoided.
 

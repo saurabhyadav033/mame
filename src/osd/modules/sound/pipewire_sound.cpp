@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#ifndef NO_USE_PIPEWIRE
-
 #include "sound_module.h"
 #include "modules/osdmodule.h"
+
+#ifndef NO_USE_PIPEWIRE
 
 #define GNU_SOURCE
 #include "modules/lib/osdobj_common.h"
